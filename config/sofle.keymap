@@ -8,22 +8,27 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/keys.h>
+
+/* ZMK mouse/scroll defines */
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 40
 #include <dt-bindings/zmk/pointing.h>
 
-/ {
+ / {
     behaviors {
         /*
-         * Horizontal scroll encoder wrapper:
-         * Uses the variable sensor rotation behavior to invoke &msc with
-         * different parameters for CW and CCW.
+         * Horizontal scroll encoder wrapper.
          *
-         * This is required because encoder sensor-bindings must reference a
-         * sensor behavior that declares #sensor-binding-cells.
+         * We use the variable sensor rotation behavior so we can pass different
+         * parameters for CW and CCW at the sensor-bindings site.
+         *
+         * IMPORTANT: Increase tap-ms so the scroll "tap" lasts long enough to
+         * produce a visible wheel event.
          */
         hscroll: hscroll {
             compatible = "zmk,behavior-sensor-rotate-var";
             #sensor-binding-cells = <2>;
             bindings = <&msc>, <&msc>;
+            tap-ms = <40>;
         };
     };
 
@@ -42,15 +47,15 @@
             >;
 
             /*
-             * Left encoder: true horizontal scroll
-             *   CW  -> SCRL_RIGHT
-             *   CCW -> SCRL_LEFT
+             * Left encoder: true horizontal scroll wheel
+             *   CW  -> MOVE_X(+40)  (scroll right)
+             *   CCW -> MOVE_X(-40)  (scroll left)
              *
              * Right encoder: volume
              *   CW  -> C_VOL_UP
              *   CCW -> C_VOL_DN
              */
-            sensor-bindings = <&hscroll SCRL_RIGHT SCRL_LEFT &inc_dec_kp C_VOL_UP C_VOL_DN>;
+            sensor-bindings = <&hscroll MOVE_X(40) MOVE_X(-40) &inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
 
         lower_layer {
@@ -64,7 +69,7 @@
                       &trans     &trans       &trans    &trans     &trans    &trans  &trans     &trans    &trans           &trans
             >;
 
-            sensor-bindings = <&hscroll SCRL_RIGHT SCRL_LEFT &inc_dec_kp C_VOL_UP C_VOL_DN>;
+            sensor-bindings = <&hscroll MOVE_X(40) MOVE_X(-40) &inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
 
         raise_layer {
@@ -78,7 +83,7 @@
                           &trans        &trans        &trans        &trans        &trans    &trans  &trans     &trans    &trans  &trans
             >;
 
-            sensor-bindings = <&hscroll SCRL_RIGHT SCRL_LEFT &inc_dec_kp C_VOL_UP C_VOL_DN>;
+            sensor-bindings = <&hscroll MOVE_X(40) MOVE_X(-40) &inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
     };
 };
